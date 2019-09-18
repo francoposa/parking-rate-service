@@ -1,8 +1,8 @@
 import datetime
 from typing import Iterable, List, Optional
 
-from usecases.interfaces import IRateRepo
-from usecases.resources.rate import Rate
+from app.usecases.interfaces import IRateRepo
+from app.usecases.resources.rate import Rate
 
 
 class InMemoryRateRepo(IRateRepo):

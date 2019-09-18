@@ -3,7 +3,7 @@ from typing import Iterable, Mapping, List
 
 import pytz
 
-from usecases.resources.rate import Rate
+from app.usecases.resources.rate import Rate
 
 TIME_FMT = "%H%M"
 

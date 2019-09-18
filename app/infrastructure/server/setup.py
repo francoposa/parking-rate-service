@@ -2,7 +2,7 @@ from typing import Any
 
 from aiohttp import web
 
-from infrastructure.server.handlers import health, rate
+from app.infrastructure.server.handlers import rate, health
 
 HEALTH_PATH = "/health"
 RATE_PATH = "/api/v1/rates"

@@ -1,13 +1,14 @@
 import json
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 
 from aiohttp import web
 from multidict import MultiMapping
 
-from infrastructure.server.app_constants import RATE_REPO
-from usecases.interfaces import IRateRepo
-from usecases.resources.rate import Rate
+from app.infrastructure.server.adapters.rate import deserialize_rates
+from app.infrastructure.server.app_constants import RATE_REPO
+from app.usecases.interfaces import IRateRepo
+from app.usecases.resources.rate import Rate
 
 DATETIME_FMT = "%Y-%m-%dT%H:%M:%S%z"  # ISO-8601
 
@@ -24,11 +25,12 @@ async def get_rates(request: web.Request) -> web.Response:
         end_timestamp: datetime = datetime.strptime(
             query_map["end_timestamp"], DATETIME_FMT
         )
-    except Exception as e:
-        raise web.HTTPUnprocessableEntity(
+    except Exception:
+        raise web.HTTPBadRequest(
             text=json.dumps(
                 {"error": f"start and end timestamp must be in format {DATETIME_FMT}"}
-            )
+            ),
+            content_type="application/json",
         )
 
     # Attempt to get matching rate
@@ -38,11 +40,13 @@ async def get_rates(request: web.Request) -> web.Response:
             start_timestamp, end_timestamp
         )
     except IRateRepo.TimeRangeError as e:
-        raise web.HTTPUnprocessableEntity(text=json.dumps({"errors": [str(e)]}))
+        raise web.HTTPBadRequest(
+            text=json.dumps({"error": str(e)}), content_type="application/json"
+        )
 
     if not rate:
         # Valid request, but no rates exist for this time period
-        return web.json_response({"message": "No rate found for this time range"})
+        return web.json_response({"price": "Unavailable"})
 
     # Single matching rate found. Return its price.
     return web.json_response({"price": rate.price})
@@ -55,16 +59,20 @@ async def post_rates(request: web.Request) -> web.Response:
         post_data = await request.json()
     except Exception:
         raise web.HTTPBadRequest(
-            text=json.dumps({"errors": ["The supplied JSON is invalid."]})
+            text=json.dumps(
+                {"error": "supplied JSON is invalid."}, content_type="application/json"
+            )
         )
 
     try:
         json_rates = post_data["rates"]
-        await rate_repo.set_rates(json_rates)
+        rates: List[Rate] = deserialize_rates(json_rates)
+        await rate_repo.set_rates(rates)
     except Exception:
         raise web.HTTPUnprocessableEntity(
             text=json.dumps(
-                {"errors": ["The supplied JSON does not contain valid rate objects"]}
-            )
+                {"error": "supplied JSON does not contain valid rate objects"}
+            ),
+            content_type="application/json",
         )
     return web.json_response({"message": "New rates posted"})

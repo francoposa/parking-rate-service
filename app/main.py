@@ -7,12 +7,12 @@ from typing import Mapping, List
 
 from aiohttp import web
 
-from infrastructure.datatastore.app_memory.rate.repo import InMemoryRateRepo
-from infrastructure.server.adapters.rate import deserialize_rates
-from infrastructure.server.app_constants import RATE_REPO
-from infrastructure.server.setup import setup_routes, register_dependency
-from usecases.interfaces import IRateRepo
-from usecases.resources.rate import Rate
+from app.infrastructure.datatastore.in_memory.repos.rate import InMemoryRateRepo
+from app.infrastructure.server.adapters.rate import deserialize_rates
+from app.infrastructure.server.app_constants import RATE_REPO
+from app.infrastructure.server.setup import setup_routes, register_dependency
+from app.usecases.interfaces import IRateRepo
+from app.usecases.resources.rate import Rate
 
 
 def on_startup(conf: Mapping):
@@ -25,6 +25,7 @@ def on_startup(conf: Mapping):
         rate_repo: IRateRepo = InMemoryRateRepo()
         rates_file = open(conf["rates"]["rates_filepath"])
         rates: List[Rate] = deserialize_rates(json.load(rates_file)["rates"])
+        print(rates)
         await rate_repo.set_rates(rates)
         register_dependency(app, RATE_REPO, rate_repo)
 

@@ -2,7 +2,7 @@ import datetime
 from abc import ABCMeta, abstractmethod
 from typing import Iterable, Optional
 
-from usecases.resources.rate import Rate
+from app.usecases.resources.rate import Rate
 
 
 class IRateRepo(metaclass=ABCMeta):
