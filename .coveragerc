@@ -1,0 +1,4 @@
+[report]
+omit =
+	app/infrastructure/server/handlers/health.py
+	app/main.py
