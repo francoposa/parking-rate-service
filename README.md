@@ -48,7 +48,7 @@ Intial parking rates are loaded from `files/rates.json` upon startup.
  Replace the stored parking rates with a new set of rates
  
  Currently no business-logic validation is done on the rates. It is up to the user to submit rates with accurate time periods and prices.
- POST will fail if any invalid or incorrectly-formatted data is supplied.
+ POST will fail atomically if any invalid or incorrectly-formatted data is supplied.
  
  JSON Rate objects:
  - `days`: `string`
