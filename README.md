@@ -1,4 +1,4 @@
-# Parking Price Service
+# Parking Rate Service
 A service to store and search for parking rates
 
  #### Setup
