@@ -3,11 +3,16 @@ import json
 import logging
 import os
 import sys
-from typing import Mapping
+from typing import Mapping, List
 
 from aiohttp import web
 
-from infrastructure.server.http.setup import setup_routes
+from infrastructure.datatastore.app_memory.rate.repo import InMemoryRateRepo
+from infrastructure.server.adapters.rate import deserialize_rates
+from infrastructure.server.app_constants import RATE_REPO
+from infrastructure.server.setup import setup_routes, register_dependency
+from usecases.interfaces import IRateRepo
+from usecases.resources.rate import Rate
 
 
 def on_startup(conf: Mapping):
@@ -16,7 +21,15 @@ def on_startup(conf: Mapping):
     async def startup_handler(app: web.Application):
         setup_routes(app)
 
+        # Set up rate repo, load rates, and register the repo with the app
+        rate_repo: IRateRepo = InMemoryRateRepo()
+        rates_file = open(conf["rates"]["rates_filepath"])
+        rates: List[Rate] = deserialize_rates(json.load(rates_file)["rates"])
+        await rate_repo.set_rates(rates)
+        register_dependency(app, RATE_REPO, rate_repo)
+
     return startup_handler
+
 
 def main():
     arg_parser = argparse.ArgumentParser()
