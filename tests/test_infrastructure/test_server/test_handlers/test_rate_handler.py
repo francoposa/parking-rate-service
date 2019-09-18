@@ -1,5 +1,8 @@
+from typing import List
+
 from app.infrastructure.server.handlers.rate import DATETIME_FMT
 from app.infrastructure.server.setup import RATE_PATH
+from app.usecases.resources.rate import Rate
 
 
 async def test_get_success(web_client):
@@ -112,3 +115,23 @@ async def test_post_success(web_client, rate_post):
     )
     response_body = await response.json()
     assert response_body["price"] == "Unavailable"
+
+
+async def test_post_error(web_client, rate_repo, rate_post):
+
+    # Get rates before POST
+    baseline_rates: List[Rate] = rate_repo._data
+
+    # Make one of the new JSON rates invalid with an unsupported timezone
+    rate_post["rates"][0]["tz"] = "Amrica/Chicago"
+
+    # POST rates where one has invalid timezone
+    response = await web_client.post(RATE_PATH, json=rate_post)
+
+    # Assert expected failure
+    assert response.status == 400
+    response_body = await response.json()
+    assert response_body["error"] == "supplied JSON contains invalid rate objects"
+
+    # Assert no effect on rates in app
+    assert baseline_rates == rate_repo._data

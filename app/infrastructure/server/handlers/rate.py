@@ -69,10 +69,8 @@ async def post_rates(request: web.Request) -> web.Response:
         rates: List[Rate] = deserialize_rates(json_rates)
         await rate_repo.set_rates(rates)
     except Exception:
-        raise web.HTTPUnprocessableEntity(
-            text=json.dumps(
-                {"error": "supplied JSON does not contain valid rate objects"}
-            ),
+        raise web.HTTPBadRequest(
+            text=json.dumps({"error": "supplied JSON contains invalid rate objects"}),
             content_type="application/json",
         )
     return web.json_response({"message": "New rates posted"})

@@ -25,7 +25,6 @@ def on_startup(conf: Mapping):
         rate_repo: IRateRepo = InMemoryRateRepo()
         rates_file = open(conf["rates"]["rates_filepath"])
         rates: List[Rate] = deserialize_rates(json.load(rates_file)["rates"])
-        print(rates)
         await rate_repo.set_rates(rates)
         register_dependency(app, RATE_REPO, rate_repo)
 
