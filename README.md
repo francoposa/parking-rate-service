@@ -14,7 +14,7 @@ A service to store and search for parking rates
 
 ```$ python app/main.py --config config.local.json```
 
-Intial parking rates are loaded from `files/rates.json` upon startup.
+Initial parking rates are loaded from `files/rates.json` upon startup.
 
  #### Test with Coverage Report
  Ensure `PYTHONPATH` env var is set to the root directory of the repo
@@ -69,7 +69,7 @@ Intial parking rates are loaded from `files/rates.json` upon startup.
  
  If I were to develop further on this application, my top priorities would likely be:
  - Write tests specifically for the `RateRepo`
-    - Endpoint handler tests currently cover this by calling RateRepo functionality, but having more specific test allow for quicker understanding of where & how a change causes breakage
+    - Endpoint handler tests currently cover this by calling RateRepo functionality, but having more specific tests allow for quicker understanding of where & how a change causes breakage
  - Write tests to ensure any timezone conversion logic corner cases are being handled
  - Add more helpful responses about the reason for a rate request returning `Unavailable`
   
